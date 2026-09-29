@@ -2,6 +2,8 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1D2023">
 <title>Kalkulator prędkości skrawania i posuwu</title>
 <style>
   :root{
@@ -17,6 +19,7 @@
     --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   *{box-sizing:border-box;}
+  html{ min-width:320px; }
   body{
     margin:0;
     background: var(--bg);
@@ -26,8 +29,10 @@
     font-size: 17px;
     display:flex;
     justify-content:center;
+    min-height:100vh;
+    min-height:100svh;
   }
-  .wrap{ width:100%; max-width: 700px; }
+  .wrap{ width:100%; max-width: 700px; min-width:0; }
 
   .header{
     display:flex;
@@ -66,6 +71,7 @@
     border: none;
     color: var(--text-dim);
     padding: 10px 22px;
+    min-height:44px;
     border-radius: 6px;
     font-size: 15px;
     font-family: var(--mono);
@@ -87,10 +93,12 @@
   }
   .mode-switch button{
     flex:1;
+    min-width:0;
     background: transparent;
     border: none;
     color: var(--text-dim);
     padding: 14px 10px;
+    min-height:48px;
     border-radius: 7px;
     font-size: 16px;
     font-family: var(--sans);
@@ -110,10 +118,12 @@
   }
   .sub-switch button{
     flex:1;
+    min-width:0;
     background: var(--panel);
     border: 1px solid var(--line);
     color: var(--text-dim);
     padding: 12px 8px;
+    min-height:44px;
     border-radius: 8px;
     font-size: 15px;
     font-family: var(--sans);
@@ -137,14 +147,17 @@
   .field:last-child{ margin-bottom: 0; }
   .field label{
     display:flex;
+    align-items:baseline;
     justify-content:space-between;
+    gap:12px;
     font-size: 14.5px;
     color: var(--text-dim);
     margin-bottom: 8px;
   }
-  .field label .unit{ color: var(--text-dim); font-family: var(--mono); }
+  .field label .unit{ color: var(--text-dim); font-family: var(--mono); white-space:nowrap; }
   .field input{
     width:100%;
+    min-width:0;
     background: var(--panel-2);
     border: 1px solid var(--line);
     color: var(--text);
@@ -153,6 +166,7 @@
     padding: 14px 16px;
     border-radius: 8px;
     outline:none;
+    min-height:52px;
   }
   .field input:focus{ border-color: var(--accent); }
 
@@ -214,6 +228,92 @@
     text-align:right;
     font-family: var(--mono);
     color: var(--accent);
+    white-space:nowrap;
+  }
+
+  button, input, summary{ -webkit-tap-highlight-color:transparent; }
+  button{ touch-action:manipulation; }
+  :focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+  }
+
+  @media (max-width: 600px){
+    body{
+      padding:24px 16px calc(24px + env(safe-area-inset-bottom));
+    }
+    .header{
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .header h1{
+      font-size:clamp(21px, 6vw, 27px);
+      line-height:1.2;
+    }
+    .header .sym{
+      flex:none;
+      font-size:18px;
+    }
+    .unit-toggle{ margin-bottom:12px; }
+    .mode-switch{ margin-bottom:12px; }
+    .mode-switch button{
+      padding:12px 5px;
+      font-size:clamp(13px, 3.5vw, 16px);
+    }
+    .sub-switch{ gap:6px; }
+    .sub-switch button{
+      padding:10px 6px;
+      font-size:14px;
+      line-height:1.25;
+    }
+    .panel{
+      padding:20px 18px;
+      margin-bottom:16px;
+    }
+    .field{ margin-bottom:18px; }
+    .field label{
+      align-items:flex-start;
+      flex-direction:column;
+      gap:3px;
+      margin-bottom:7px;
+    }
+    .field input{
+      font-size:20px;
+      padding:12px 14px;
+    }
+    .readout{
+      align-items:flex-start;
+      flex-direction:column;
+      gap:8px;
+      padding:20px;
+    }
+    .readout .rvalue{
+      font-size:clamp(34px, 11vw, 44px);
+    }
+    .readout .runit{
+      font-size:15px;
+      margin-left:5px;
+    }
+    .formula{
+      font-size:clamp(12px, 3.5vw, 15px);
+      overflow-wrap:anywhere;
+    }
+    .ref table{ font-size:14px; }
+    .ref td{ padding:9px 4px; }
+  }
+
+  @media (max-width: 360px){
+    body{ padding-left:12px; padding-right:12px; }
+    .panel{ padding:18px 14px; }
+    .readout{ padding:18px 16px; }
+    .mode-switch button{ font-size:12.5px; }
+    .sub-switch button{ font-size:13px; }
+    .ref table{ font-size:13px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ scroll-behavior:auto !important; transition:none !important; }
   }
 </style>
 </head>
@@ -250,31 +350,31 @@
 
   <div class="panel">
     <div class="field" id="field-D">
-      <label><span>Średnica narzędzia / przedmiotu</span><span class="unit" id="unit-D">D [mm]</span></label>
+      <label for="D"><span>Średnica narzędzia / przedmiotu</span><span class="unit" id="unit-D">D [mm]</span></label>
       <input type="number" id="D" value="20" step="0.1" min="0" oninput="calc()">
     </div>
     <div class="field" id="field-n">
-      <label><span>Prędkość obrotowa</span><span class="unit">n [obr/min]</span></label>
+      <label for="n"><span>Prędkość obrotowa</span><span class="unit">n [obr/min]</span></label>
       <input type="number" id="n" value="1200" step="1" min="0" oninput="calc()">
     </div>
     <div class="field" id="field-vc" style="display:none;">
-      <label><span>Prędkość skrawania</span><span class="unit" id="unit-vc">Vc [m/min]</span></label>
+      <label for="vc"><span>Prędkość skrawania</span><span class="unit" id="unit-vc">Vc [m/min]</span></label>
       <input type="number" id="vc" value="75" step="0.5" min="0" oninput="calc()">
     </div>
     <div class="field" id="field-fz" style="display:none;">
-      <label><span>Posuw na ząb</span><span class="unit" id="unit-fz">fz [mm/ząb]</span></label>
+      <label for="fz"><span>Posuw na ząb</span><span class="unit" id="unit-fz">fz [mm/ząb]</span></label>
       <input type="number" id="fz" value="0.08" step="0.01" min="0" oninput="calc()">
     </div>
     <div class="field" id="field-z" style="display:none;">
-      <label><span>Liczba ostrzy (zębów)</span><span class="unit">z [-]</span></label>
+      <label for="z"><span>Liczba ostrzy (zębów)</span><span class="unit">z [-]</span></label>
       <input type="number" id="z" value="4" step="1" min="1" oninput="calc()">
     </div>
     <div class="field" id="field-f" style="display:none;">
-      <label><span>Posuw na obrót</span><span class="unit" id="unit-f">f [mm/obr]</span></label>
+      <label for="f"><span>Posuw na obrót</span><span class="unit" id="unit-f">f [mm/obr]</span></label>
       <input type="number" id="f" value="0.15" step="0.01" min="0" oninput="calc()">
     </div>
     <div class="field" id="field-vfinput" style="display:none;">
-      <label><span id="vfinput-label">Prędkość posuwu</span><span class="unit" id="unit-vfinput">Vf [mm/min]</span></label>
+      <label for="vfinput"><span id="vfinput-label">Prędkość posuwu</span><span class="unit" id="unit-vfinput">Vf [mm/min]</span></label>
       <input type="number" id="vfinput" value="400" step="1" min="0" oninput="calc()">
     </div>
   </div>
